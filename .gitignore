@@ -1,2 +1,6 @@
 images
 .idea
+__pycache__/
+.env
+databases
+model
