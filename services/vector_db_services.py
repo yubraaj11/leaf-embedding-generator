@@ -93,7 +93,6 @@ class VectorDatabase:
             limit=5,  # number of returned entities
             output_fields=["id", "Image_name"],  # specifies fields to be returned
         )
-        print(len(results))
         return results
 
     def print_values(self, test_image):
