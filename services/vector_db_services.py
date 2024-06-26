@@ -3,7 +3,7 @@ from pymilvus import MilvusClient
 import os
 import numpy as np
 
-DB_NAME = 'databases/milvus_demo_db'
+DB_NAME = '/home/ubuntu/Documents/vertex-projects/image_embedder/databases/milvus_demo_db'
 COLLECTION_NAME = 'demo_collection'
 
 FILE_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -47,36 +47,35 @@ class VectorDatabase:
         embeddings = test_obj.embedding_generator(image_path=image_path)
         return embeddings
 
-    def data_for_db(self, image_names: list, image_paths: list) -> list:
+    def data_for_db(self, image_path_list: list) -> list:
         """
         Returns list of data for vector database
-        :param image_names: short image names
-        :param image_paths: List of path of each images
+        :param image_path_list: List of path of each images
         :return: list with dictionary
         """
         # self.create_collection()
         data = []
-        for img_nm, img_pth in zip(image_names,image_paths)):
-            image_embedding = self.embedding_model(image_path=img_pth)
+        for i in range(len(image_path_list)):
+            image_embedding = self.embedding_model(image_path=image_path_list[i])
 
-            # path = image_path_list[i].split(".")[0]
+            path = image_path_list[i].split("/")[-1]
             img_data = {
                 "id": i,
                 "vector": image_embedding,
-                "Image_name": image_name,  # Changed to -1 to get the image name correctly
+                "Image_name": path.split('.')[0],  # Changed to -1 to get the image name correctly
             }
             data.append(img_data)  # Append each dictionary to the data list
         return data
 
-    def push_to_db(self, image_names: list, image_path_list: list):
+    def push_to_db(self, image_path_list: list):
         """
         pushes data into vector database
         :return:None
         """
         conn = VectorDatabase._conn
-        data = self.data_for_db(image_names, image_paths)
+        data = self.data_for_db(image_path_list)
         conn.insert(collection_name=COLLECTION_NAME, data=data)
-        # print(f"{len(data)} : Values pushed to DB")
+        print(f"{len(data)} : Values pushed to DB")
 
     def semantic_search(self, test_image: str) -> list:
         """
@@ -89,11 +88,12 @@ class VectorDatabase:
         test_embeddings = self.embedding_model(image_path=test_image)
         test_embeddings = test_embeddings.reshape(1, -1).tolist()  # Convert the embeddings to a list of lists
         results = conn.search(
-            collection_name="demo_collection",  # target collection
+            collection_name=COLLECTION_NAME,   # target collection
             data=test_embeddings,  # query vectors should be a list of vectors
-            limit=2,  # number of returned entities
+            limit=5,  # number of returned entities
             output_fields=["id", "Image_name"],  # specifies fields to be returned
         )
+        print(len(results))
         return results
 
     def print_values(self, test_image):

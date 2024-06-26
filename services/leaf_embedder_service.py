@@ -4,12 +4,9 @@ from torchvision import models, transforms
 from PIL import Image
 import os
 import numpy as np
-from sklearn.metrics.pairwise import cosine_similarity
+# from utils.image_processing_util import *
 
-from utils.image_processing_util import *
-
-FILE_PATH = os.path.dirname(os.path.abspath(__file__))
-
+FILE_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 try:
     TRAINED_MODEL_PATH = os.path.join(FILE_PATH, 'model', 'resnet50_finetuned_25.pth')
 except FileNotFoundError as fn:
@@ -75,10 +72,3 @@ class LeafEmbedder:
         return embedding
 
 
-if __name__ == "__main__":
-    image_path_ = "images/orange_3.JPG"
-
-    leaf_embedding = LeafEmbedder()
-
-    embedding_of_image = leaf_embedding.embedding_generator(image_path=image_path_)
-    print(embedding_of_image.shape)
