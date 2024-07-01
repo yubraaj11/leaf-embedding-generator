@@ -1,6 +1,8 @@
 from pymilvus import connections, FieldSchema, CollectionSchema, DataType, Collection
 import os
 from services.resnet_image_embedder_service import ResNetImageEmbedder
+from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
 
 
 class Milvus:
@@ -36,17 +38,11 @@ class Milvus:
         :return:
         """
         collection.insert([embeddings, image_names])
-        # index_params = {
-        #     # "index_type": "IVF_FLAT",
-        #     "index_type": "IVF_FLAT",
-        #     "params": {"nlist": 128},
-        #     "metric_type": "COSINE"
-        # }
 
         index_params = {
-            "index_type": "HNSW",
-            "metric_type": "COSINE",
-            "params": {"M": 32, "efConstruction": 300}  # Adjusted parameters for example
+            "index_type": "IVF_FLAT",
+            "params": {"nlist": 128},
+            "metric_type": "L2"
         }
         collection.create_index("embedding", index_params)
         collection.load()
@@ -70,29 +66,32 @@ class Milvus:
                     if os.path.isfile(image_path):
                         embedding = Milvus._resnet_instance.generate_embedding(image_path)
                         embeddings.append(embedding)
-                        image_names.append(image_name)
+                        image_names.append(os.path.splitext(image_name)[0])
                 self.insert_embeddings(collection, embeddings, image_names)
 
-    def classify_leaf_disease(self, input_image_path, collection_name):
+    def get_collection_embeddings(self, collection_name):
+        collection = Collection(collection_name)
+        entities = collection.query(expr="id >= 0", output_fields=["embedding", "image_name"])
+        embeddings = [np.array(entity["embedding"]) for entity in entities]
+        image_names = [entity["image_name"] for entity in entities]
+        return embeddings, image_names
 
-        collection =Collection(name=collection_name)
+    def classify_leaf_disease(self, input_image_path, collection_name, top_k):
+
+        # collection =Collection(name=collection_name)
         test_embeddings = Milvus._resnet_instance.generate_embedding(image_path=input_image_path)
-        test_embeddings = test_embeddings.reshape(1, -1).tolist()  # Convert the embeddings to a list of lists
+        embeddings, image_names = self.get_collection_embeddings(collection_name)
 
-        search_params = {
-            "metric_type": "COSINE",
-            # "params": {"nprobe": 10}
-            "params": {"ef": 10}
-        }
+        similarities = cosine_similarity([test_embeddings], embeddings)[0]
+        results = [
+            {
+                "collection_name": collection_name,
+                "image_name": image_names[idx],
+                "similarity": similarities[idx]
+            }
+            for idx in range(len(embeddings))
+        ]
+        results.sort(key=lambda x: x["similarity"], reverse=True)
 
-        results = collection.search(
-            data=test_embeddings,  # Query vectors should be a list of vectors
-            anns_field="embedding",  # Field name where embeddings are stored
-            param=search_params,
-            limit=5,  # Number of returned entities
-            output_fields=["id", "image_name"]  # Specifies fields to be returned
-        )
-
-        return results
-
+        return results[:top_k]
 
