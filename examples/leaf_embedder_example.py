@@ -11,4 +11,5 @@ if __name__ == "__main__":
     embedding_of_image_2 = leaf_embedding.embedding_generator(image_path=image_path_2)
 
     print(cosine_similarity([embedding_of_image], [embedding_of_image_2])[0][0])
-    print(embedding_of_image.shape)
+
+    # print(embedding_of_image.shape)
