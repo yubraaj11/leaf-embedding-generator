@@ -6,9 +6,9 @@ import os
 import numpy as np
 # from utils.image_processing_util import *
 
-FILE_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+FILE_PATH = os.path.dirname(os.path.abspath(__file__))
 try:
-    TRAINED_MODEL_PATH = os.path.join(FILE_PATH, 'model', 'resnet50_finetuned_25.pth')
+    TRAINED_MODEL_PATH = os.path.join(FILE_PATH, '..', 'model', 'resnet50_finetuned_25.pth')
 except FileNotFoundError as fn:
     raise FileNotFoundError(f"fine-tuned resnet model missing: {fn}")
 

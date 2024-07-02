@@ -6,10 +6,10 @@ import numpy as np
 DB_NAME = '/home/ubuntu/Documents/vertex-projects/image_embedder/databases/milvus_demo_db'
 COLLECTION_NAME = 'demo_collection'
 
-FILE_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+FILE_PATH = os.path.dirname(os.path.abspath(__file__))
 
 try:
-    TRAINED_MODEL_PATH = os.path.join(FILE_PATH, 'model', 'resnet50_finetuned_25.pth')
+    TRAINED_MODEL_PATH = os.path.join(FILE_PATH, '..', 'model', 'resnet50_finetuned_25.pth')
 except FileNotFoundError as fn:
     raise FileNotFoundError(f"fine-tuned resnet model missing: {fn}")
 
@@ -58,11 +58,10 @@ class VectorDatabase:
         for i in range(len(image_path_list)):
             image_embedding = self.embedding_model(image_path=image_path_list[i])
 
-            path = image_path_list[i].split("/")[-1]
             img_data = {
                 "id": i,
                 "vector": image_embedding,
-                "Image_name": path.split('.')[0],  # Changed to -1 to get the image name correctly
+                "Image_name": image_path_list[i].split("/")[-2],  # Changed to -1 to get the image name correctly
             }
             data.append(img_data)  # Append each dictionary to the data list
         return data

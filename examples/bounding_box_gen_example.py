@@ -1,4 +1,4 @@
-from services.yolo_initializer_service import YoloInitializer
+from services.bounding_box_gen_service import YoloInitializer
 import os
 import cv2
 
