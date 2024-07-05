@@ -29,7 +29,7 @@ class LeafEmbedder:
         """
         model = models.resnet50(weights='ResNet50_Weights.DEFAULT')
         num_features = model.fc.in_features
-        model.fc = nn.Linear(num_features, 10)
+        model.fc = nn.Linear(num_features, 26)
         model = model.to(device=self.device)
         return model
 
