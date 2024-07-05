@@ -2,8 +2,8 @@ from services.leaf_embedder_service import LeafEmbedder
 from sklearn.metrics.pairwise import cosine_similarity
 
 if __name__ == "__main__":
-    image_path_1 = "/home/ubuntu/Documents/vertex-projects/image_embedder/images/strawberry_LS_Test.JPG"
-    image_path_2 = "/home/ubuntu/Documents/vertex-projects/image_embedder/images/strawberry_LS_test.JPG"
+    image_path_1 = "/home/ubuntu/Downloads/TEST/DESTINATION/potato_healthy/image (3)_0_augmented_19.JPG"
+    image_path_2 = "/home/ubuntu/Downloads/TEST/DESTINATION/potato_healthy/image (1)_0_augmented_975.JPG"
 
     leaf_embedding = LeafEmbedder()
 
