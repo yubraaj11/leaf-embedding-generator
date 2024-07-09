@@ -8,7 +8,7 @@ import numpy as np
 
 FILE_PATH = os.path.dirname(os.path.abspath(__file__))
 try:
-    TRAINED_MODEL_PATH = os.path.join(FILE_PATH, '..', 'model', 'resnet50_finetuned_25.pth')
+    TRAINED_MODEL_PATH = os.path.join(FILE_PATH, '..', 'model', 'resnet50_finetuned_25ep_26cl.pth')
 except FileNotFoundError as fn:
     raise FileNotFoundError(f"fine-tuned resnet model missing: {fn}")
 
@@ -57,8 +57,9 @@ class LeafEmbedder:
         image = Image.open(image_path).convert('RGB')
 
         transform = transforms.Compose([
-            transforms.Resize(256),
-            transforms.CenterCrop(224),
+            # transforms.Resize(256),
+            transforms.Resize(224),
+            # transforms.CenterCrop(224),
             transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ])
